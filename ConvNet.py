@@ -71,9 +71,24 @@ model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
 model.add(tf.keras.layers.Dropout(0.25))
 
 
+#testing to make it deeper, since the other attempts to improve it failed [64 -> 94.35% in 80 epochs, after this, begins overfitting]; [128 -> 93.81 da overfit in 60 epochs]; 32 is also worst then 64
+model.add(tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding='same', activation='relu', input_shape=(28,28,1)))
+model.add(tf.keras.layers.Activation("relu"))
+model.add(tf.keras.layers.BatchNormalization(axis=-1)) #-1 for chanels last +1 if using channels first
+
+model.add(tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding='same', activation='relu'))
+model.add(tf.keras.layers.Activation("relu"))
+model.add(tf.keras.layers.BatchNormalization(axis=-1)) #-1 for chanels last +1 if using channels first
+
+model.add(tf.keras.layers.MaxPooling2D(pool_size=2))
+model.add(tf.keras.layers.Dropout(0.25))
+
 model.add(tf.keras.layers.Flatten())
 #model.add(tf.keras.layers.Dense(512, kernel_regularizer=keras.regularizers.l2(0.001),activation=tf.nn.relu))
-model.add(tf.keras.layers.Dense(64, kernel_regularizer=keras.regularizers.l2(0.001),
+model.add(tf.keras.layers.Dense(256, kernel_regularizer=keras.regularizers.l2(0.001),
+                             activation=tf.nn.relu))
+model.add(tf.keras.layers.BatchNormalization())
+model.add(tf.keras.layers.Dense(128, kernel_regularizer=keras.regularizers.l2(0.001),
                              activation=tf.nn.relu))
 model.add(tf.keras.layers.BatchNormalization())
 model.add(tf.keras.layers.Dropout(0.5))
@@ -86,15 +101,15 @@ model.compile(optimizer='adam',
               loss = 'binary_crossentropy',
               metrics=['accuracy', 'binary_crossentropy'])
 
-
+    
 model.fit_generator(
-        train_images,
-        steps_per_epoch=8000,
-        epochs=1,
-        validation_data= test_images,
-        validation_steps=2000,
-        verbose=1,
-        callbacks = [cp_callback])
+            train_images,
+            steps_per_epoch=8000,
+            epochs=50,
+            validation_data= test_images,
+            validation_steps=2000,
+            verbose=1,
+            callbacks = [cp_callback])
 
 
 ### LOADING MODEL WEIGHTS SAVED PREVIOUSLY
